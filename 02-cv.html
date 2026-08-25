@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 02 — Sensores e Aquisição de Imagens</title>
+<style>
+  :root {
+    --bg: #fbfbf9;
+    --ink: #1f2320;
+    --muted: #5c645e;
+    --accent: #2f6f4f;
+    --line: #dfe3de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.6;
+  }
+  header {
+    padding: 3rem 1.5rem 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .semana {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.5rem;
+  }
+  h1 {
+    font-size: 1.9rem;
+    margin: 0;
+    font-weight: normal;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  p {
+    font-size: 1.08rem;
+    color: var(--ink);
+  }
+  h2 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2rem 0 0.5rem;
+  }
+  ul {
+    padding-left: 1.2rem;
+  }
+  li {
+    margin-bottom: 0.5rem;
+  }
+  .destaque {
+    border-left: 3px solid var(--accent);
+    padding-left: 1rem;
+    margin: 2rem 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="semana">Semana 02</p>
+  <h1>Sensores e Aquisição de Imagens</h1>
+</header>
+
+<main>
+  <p>
+    Antes de qualquer processamento, uma imagem digital precisa ser capturada.
+    Essa etapa é a aquisição: o momento em que a luz do mundo real é convertida
+    em números que o computador consegue armazenar e manipular.
+  </p>
+
+  <h2>Como a luz vira imagem</h2>
+  <p>
+    Uma câmera é composta por uma lente, que foca a luz, e um sensor,
+    que converte essa luz em sinal elétrico. Os dois tipos de sensor mais
+    comuns são o <strong>CCD</strong> (Charge-Coupled Device) e o
+    <strong>CMOS</strong> (Complementary Metal-Oxide-Semiconductor). Ambos
+    são formados por uma grade de fotodetectores, e cada um desses pontos
+    vira, depois da conversão, um pixel da imagem final.
+  </p>
+
+  <h2>Amostragem e quantização</h2>
+  <p>
+    Existem dois processos que transformam um sinal contínuo (a luz) em
+    algo discreto (a imagem digital):
+  </p>
+  <ul>
+    <li><strong>Amostragem:</strong> define quantos pontos (pixels) serão medidos no espaço — está ligada à resolução da imagem.</li>
+    <li><strong>Quantização:</strong> define quantos níveis de intensidade cada ponto pode assumir — está ligada à profundidade de bits e à qualidade tonal.</li>
+  </ul>
+
+  <h2>Cor</h2>
+  <p>
+    A maioria dos sensores enxerga apenas intensidade de luz, sem distinguir
+    cor. Para capturar cores, usa-se um filtro sobre o sensor, geralmente
+    no padrão <strong>Bayer</strong>, que intercala filtros vermelhos, verdes
+    e azuis sobre os fotodetectores. A imagem colorida final é reconstruída
+    por interpolação entre esses pontos.
+  </p>
+
+  <p class="destaque">
+    Em resumo: aquisição de imagens é a ponte entre o mundo físico
+    (luz contínua) e o mundo digital (matriz de números), e a qualidade
+    dessa ponte — sensor, amostragem, quantização — define o limite de
+    tudo que vem depois no processamento.
+  </p>
+</main>
+
+<footer>
+  Diário semanal da disciplina — Computação Visual
+</footer>
+
+</body>
+</html>
