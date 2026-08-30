@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Semana 03 — Transformações de Intensidade</title>
+<style>
+  :root {
+    --bg: #fbfbf9;
+    --ink: #1f2320;
+    --muted: #5c645e;
+    --accent: #2f6f4f;
+    --line: #dfe3de;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.6;
+  }
+  header {
+    padding: 3rem 1.5rem 1.5rem;
+    max-width: 720px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--line);
+  }
+  .semana {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 0.5rem;
+  }
+  h1 {
+    font-size: 1.9rem;
+    margin: 0;
+    font-weight: normal;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  p {
+    font-size: 1.08rem;
+    color: var(--ink);
+  }
+  h2 {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 2rem 0 0.5rem;
+  }
+  ul {
+    padding-left: 1.2rem;
+  }
+  li {
+    margin-bottom: 0.6rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.95rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  th {
+    color: var(--muted);
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+  code {
+    background: #f0f1ee;
+    padding: 0.1rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.95em;
+  }
+  .destaque {
+    border-left: 3px solid var(--accent);
+    padding-left: 1rem;
+    margin: 2rem 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+  }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="semana">Semana 03</p>
+  <h1>Transformações de Intensidade</h1>
+</header>
+
+<main>
+  <p>
+    Transformações de intensidade são operações de processamento de imagem
+    aplicadas ponto a ponto: o valor de saída de cada pixel depende apenas
+    do valor de entrada daquele mesmo pixel, sem olhar para os vizinhos.
+    De forma geral, isso é descrito como <code>s = T(r)</code>, onde
+    <code>r</code> é a intensidade original, <code>s</code> é a nova
+    intensidade, e <code>T</code> é a função de mapeamento escolhida.
+  </p>
+
+  <h2>Negativo</h2>
+  <p>
+    A transformação mais simples inverte a escala de intensidades:
+    <code>s = L - 1 - r</code>, onde <code>L</code> é o número de níveis
+    possíveis (256 para 8 bits). Pixels claros viram escuros e vice-versa.
+    É útil, por exemplo, para realçar detalhes brancos ou cinza-claros
+    embutidos em regiões escuras de imagens médicas.
+  </p>
+
+  <h2>Transformação logarítmica</h2>
+  <p>
+    Dada por <code>s = c · log(1 + r)</code>, essa transformação expande
+    os valores baixos de intensidade (tons escuros) e comprime os valores
+    altos (tons claros). É útil para exibir imagens com grande variação
+    dinâmica, como espectros de Fourier, onde a maior parte da informação
+    relevante está concentrada em valores baixos.
+  </p>
+
+  <h2>Transformação de potência (gama)</h2>
+  <p>
+    Dada por <code>s = c · r^γ</code>, essa é provavelmente a transformação
+    mais usada na prática, pois corrige a resposta não linear de monitores
+    e sensores — o chamado <em>gamma correction</em>. Quando γ &lt; 1,
+    a imagem clareia (expande sombras); quando γ &gt; 1, a imagem escurece
+    (expande realces). É o mesmo princípio por trás do ajuste de "gama"
+    em softwares de edição de imagem.
+  </p>
+
+  <h2>Fatiamento e limiarização</h2>
+  <p>
+    Também existem transformações lineares por partes, definidas
+    manualmente em vez de por uma fórmula fixa:
+  </p>
+  <table>
+    <tr><th>Técnica</th><th>O que faz</th></tr>
+    <tr><td>Alargamento de contraste</td><td>Estica um intervalo estreito de intensidades para ocupar toda a faixa disponível</td></tr>
+    <tr><td>Fatiamento de níveis de cinza</td><td>Realça uma faixa específica de intensidades, mantendo ou não o resto da imagem</td></tr>
+    <tr><td>Limiarização (threshold)</td><td>Caso extremo do fatiamento: transforma a imagem em preto e branco a partir de um valor de corte</td></tr>
+  </table>
+
+  <h2>Equalização de histograma</h2>
+  <p>
+    Diferente das anteriores, a equalização de histograma calcula a função
+    <code>T</code> automaticamente a partir da distribuição de intensidades
+    da própria imagem, redistribuindo os valores para que o histograma
+    fique mais uniforme. O resultado costuma ser uma imagem com mais
+    contraste global, especialmente útil em fotos muito escuras, muito
+    claras ou com pouco contraste.
+  </p>
+
+  <p class="destaque">
+    Em resumo: transformações de intensidade são a forma mais básica de
+    processamento de imagem — mexem em "quanto claro ou escuro" cada pixel
+    é, sem considerar sua posição ou vizinhança, mas já são suficientes
+    para melhorar contraste, corrigir exposição e realçar detalhes.
+  </p>
+</main>
+
+<footer>
+  Diário semanal da disciplina — Computação Visual
+</footer>
+
+</body>
+</html>
