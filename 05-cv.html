@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~*~ Semana 05 ~*~ Detecção de Bordas ~*~</title>
+<style>
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+  @keyframes rainbow {
+    0% { color: #ff00aa; }
+    20% { color: #ff8800; }
+    40% { color: #ffee00; }
+    60% { color: #00cc44; }
+    80% { color: #0099ff; }
+    100% { color: #ff00aa; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Comic Sans", Verdana, sans-serif;
+    color: #202020;
+    background-color: #0033cc;
+    background-image:
+      repeating-linear-gradient(45deg, #0033cc 0px, #0033cc 18px, #0044ee 18px, #0044ee 36px);
+    background-attachment: fixed;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  marquee {
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 6px 0;
+    border: 3px ridge #ccc;
+  }
+  .titlebox {
+    background: linear-gradient(180deg, #ffe066 0%, #ffcc00 50%, #ffaa00 100%);
+    border: 4px outset #fff3b0;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 10px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 2.1rem;
+    text-shadow: 2px 2px 0 #fff, 3px 3px 0 #cc0000;
+    animation: rainbow 4s linear infinite;
+  }
+  .subtitle {
+    font-weight: bold;
+    color: #cc0000;
+    margin-top: 4px;
+  }
+  .blink {
+    animation: blinker 1s step-start infinite;
+    color: #ff0000;
+    font-weight: bold;
+  }
+  .content {
+    background: #ffffff;
+    border: 5px double #000080;
+    padding: 1.2rem 1.4rem;
+    margin-top: 10px;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+  }
+  .construction {
+    background: repeating-linear-gradient(45deg, #ffee00, #ffee00 14px, #111 14px, #111 28px);
+    color: #111;
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+    border: 3px solid #000;
+    margin-bottom: 14px;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  h2 {
+    background: #000080;
+    color: #ffffff;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.15rem;
+    border: 2px outset #6699ff;
+    margin-top: 1.8rem;
+  }
+  h2::before { content: "► "; }
+  p, li {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  .postit {
+    background: #fff9b0;
+    border: 1px solid #d4c84a;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    transform: rotate(-0.6deg);
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.25);
+  }
+  table.kernel {
+    border-collapse: collapse;
+    margin: 0.6rem auto;
+    font-family: "Courier New", monospace;
+    background: #eef3ff;
+  }
+  table.kernel td {
+    border: 2px solid #000080;
+    width: 34px;
+    height: 30px;
+    text-align: center;
+    font-weight: bold;
+  }
+  .kernel-caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #444;
+    margin-bottom: 1rem;
+  }
+  .filterrow {
+    display: flex;
+    justify-content: center;
+    gap: 2.2rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+  }
+  .badge {
+    display: inline-block;
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border: 2px solid #0f0;
+    margin: 2px;
+  }
+  .counter {
+    background: #000;
+    color: #ff3333;
+    font-family: "Courier New", monospace;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    display: inline-block;
+    padding: 6px 10px;
+    border: 3px inset #888;
+  }
+  hr.dotted {
+    border: none;
+    border-top: 3px dotted #000080;
+    margin: 1.6rem 0;
+  }
+  .footer {
+    background: #ffe066;
+    border: 4px outset #fff3b0;
+    margin-top: 10px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .webring {
+    margin-top: 0.6rem;
+  }
+  a { color: #0000ee; }
+  a:visited { color: #551a8b; }
+  .star { color: #ff9900; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <marquee behavior="scroll" scrollamount="5">
+    ★彡 BEM-VINDO AO MEU BLOG DE COMPUTAÇÃO VISUAL 彡★ &nbsp;&nbsp; ATUALIZADO TODA SEMANA!! &nbsp;&nbsp; ADICIONE AOS FAVORITOS (CTRL+D) &nbsp;&nbsp; ★彡 MELHOR VISUALIZADO EM 800x600 彡★
+  </marquee>
+
+  <div class="titlebox">
+    <h1>DETECÇÃO DE BORDAS</h1>
+    <div class="subtitle">Semana 05 &nbsp;|&nbsp; Diário da disciplina Computação Visual <span class="blink">★ NOVO ★</span></div>
+  </div>
+
+  <div class="content">
+
+    <div class="construction">🚧 PÁGINA EM CONSTRUÇÃO — VOLTE SEMPRE! 🚧</div>
+
+    <p>
+      Opa, voltei! Essa semana o assunto foi <strong>detecção de bordas</strong>,
+      e eu achei um dos temas mais "aha" da disciplina até agora. A ideia central
+      é simples de enunciar: queremos que o computador ache os contornos de uma
+      imagem, tipo o desenho de linhas que um artista faria se fosse esboçar a
+      cena à mão. Só que "achar os contornos" esconde bastante matemática por
+      baixo do capô. Vamos nessa <span class="star">☆</span>
+    </p>
+
+    <h2>O que é uma borda, afinal?</h2>
+    <p>
+      Uma borda é onde a imagem muda de repente — uma descontinuidade nos
+      níveis de cinza. Isso pode acontecer por vários motivos diferentes,
+      mesmo que visualmente pareçam "a mesma coisa":
+    </p>
+    <ul>
+      <li>mudança na profundidade da cena (um objeto na frente de outro);</li>
+      <li>mudança na cor ou no material da superfície;</li>
+      <li>mudança na iluminação (sombra batendo em parte do objeto);</li>
+      <li>mudança na orientação da superfície (a "normal" vira para outro lado).</li>
+    </ul>
+    <p>
+      Ou seja: a mesma linha que o olho humano desenha facilmente pode ter
+      origens físicas bem diferentes — e o algoritmo não sabe disso, só vê
+      números mudando bruscamente.
+    </p>
+
+    <div class="postit">
+      📌 nota mental: pixels tendem a parecer com seus vizinhos. Quando um
+      pixel é bem diferente dos vizinhos, isso é informação importante —
+      geralmente aponta pra uma borda.
+    </div>
+
+    <h2>Imagem como função, borda como penhasco</h2>
+    <p>
+      Um jeito legal de pensar nisso: trate a imagem como uma função
+      matemática, onde a "altura" em cada ponto é o nível de cinza. Se você
+      plotar essa função, regiões constantes viram um platô, e uma borda
+      vira um penhasco íngreme. Faz sentido então usar <strong>derivadas</strong>
+      para encontrar essas "quedas":
+    </p>
+    <ul>
+      <li>a <strong>primeira derivada</strong> tem um pico exatamente onde está a borda;</li>
+      <li>a <strong>segunda derivada</strong> cruza o zero no mesmo lugar — o famoso
+        <em>zero-crossing</em>, que ajuda a localizar a borda com mais precisão.</li>
+    </ul>
+
+    <h2>O gradiente da imagem</h2>
+    <p>
+      Em duas dimensões, usamos o <strong>gradiente</strong>: um vetor formado
+      pelas derivadas parciais em x e em y. Ele aponta na direção onde a
+      intensidade muda mais rápido — sempre perpendicular à borda. O
+      comprimento desse vetor (a magnitude) indica o quão "forte" é a borda:
+      magnitude alta = transição abrupta (borda nítida), magnitude baixa =
+      transição suave (tipo um degradê).
+    </p>
+
+    <h2>Plot twist: ruído também parece borda</h2>
+    <p>
+      Só tem um problema: derivar <strong>amplifica ruído</strong>. Qualquer
+      pixel levemente fora do padrão já gera uma resposta grande no filtro
+      derivativo, e de repente a imagem inteira parece estar cheia de
+      "bordas falsas". A solução clássica é suavizar a imagem antes
+      (geralmente com um filtro Gaussiano) para apagar o ruído sem apagar
+      as bordas de verdade.
+    </p>
+    <p>
+      E tem um truque matemático bonitinho aqui: como derivar e convoluir
+      são operações que "comutam" de certa forma, dá pra calcular de uma vez
+      só a derivada do próprio kernel Gaussiano e aplicar isso direto na
+      imagem — suaviza e deriva em um único passo, economizando processamento.
+    </p>
+
+    <h2>Kernels clássicos pra calcular o gradiente</h2>
+    <p>
+      Existem várias formas (kernels) consagradas de aproximar essa derivada
+      discreta em uma imagem:
+    </p>
+    <div class="filterrow">
+      <div>
+        <table class="kernel">
+          <tr><td>1</td><td>0</td></tr>
+          <tr><td>0</td><td>-1</td></tr>
+        </table>
+        <div class="kernel-caption">Roberts (h<sub>x</sub>)</div>
+      </div>
+      <div>
+        <table class="kernel">
+          <tr><td>-1</td><td>0</td><td>1</td></tr>
+          <tr><td>-1</td><td>0</td><td>1</td></tr>
+          <tr><td>-1</td><td>0</td><td>1</td></tr>
+        </table>
+        <div class="kernel-caption">Prewitt (h<sub>x</sub>)</div>
+      </div>
+      <div>
+        <table class="kernel">
+          <tr><td>-1</td><td>0</td><td>1</td></tr>
+          <tr><td>-2</td><td>0</td><td>2</td></tr>
+          <tr><td>-1</td><td>0</td><td>1</td></tr>
+        </table>
+        <div class="kernel-caption">Sobel (h<sub>x</sub>)</div>
+      </div>
+    </div>
+    <p>
+      Roberts é o mais simples (realça mais bordas em 45°/135°); Prewitt e
+      Sobel já olham pra uma vizinhança 3×3 inteira, dando um resultado mais
+      suave — o Sobel em especial dá mais peso pra linha/coluna central, o
+      que ajuda a reduzir um pouco o ruído de quebra.
+    </p>
+
+    <h2>Suavizar demais também tem custo</h2>
+    <p>
+      Quanto mais você suaviza antes de derivar, menos ruído sobra — mas
+      também mais a borda fica "borrada" e perde-se precisão sobre onde ela
+      exatamente está. É um equilíbrio: suavização pequena detecta detalhes
+      finos, suavização grande só pega as bordas mais fortes/largas da cena.
+      Não existe um valor mágico de suavização que sirva pra tudo, depende
+      do que se quer detectar.
+    </p>
+
+    <h2>O algoritmo de Canny (o clássico dos clássicos)</h2>
+    <p>
+      O detector de bordas de Canny é praticamente o "padrão ouro" ensinado
+      em qualquer curso de processamento de imagens, porque ele tenta
+      equilibrar justamente os critérios de um bom detector: achar bordas de
+      verdade (sem se enganar com ruído), localizar elas com precisão, e dar
+      só uma resposta por borda (sem duplicar linhas). O algoritmo segue
+      basicamente 4 passos:
+    </p>
+    <ol>
+      <li><strong>Suavização:</strong> aplica um filtro Gaussiano para reduzir ruído.</li>
+      <li><strong>Gradiente:</strong> calcula magnitude e orientação do gradiente em cada pixel.</li>
+      <li><strong>Supressão de não-máximos:</strong> para cada pixel, compara sua magnitude
+        com os vizinhos na direção do gradiente — se ele não for o "pico" local,
+        é zerado. Isso deixa as bordas bem finas.</li>
+      <li><strong>Limiarização por histerese:</strong> usa dois limiares (um alto e um
+        baixo). Pixels acima do limiar alto viram borda garantida; pixels entre os
+        dois limiares só viram borda se estiverem conectados a uma borda forte.
+        Isso evita tanto ruído residual quanto bordas "quebradas" no meio do caminho.</li>
+    </ol>
+
+    <hr class="dotted">
+
+    <p>
+      <strong>Resumo da semana:</strong> detecção de bordas é basicamente
+      "onde a imagem muda rápido" — e pra achar isso de forma confiável, a
+      receita é suavizar (contra ruído), derivar (pra achar a mudança) e
+      filtrar de forma inteligente (supressão de não-máximos + histerese).
+      O Canny empacota tudo isso em um algoritmo só, e por isso continua
+      sendo referência até hoje.
+    </p>
+
+  </div>
+
+  <div class="footer">
+    <div class="counter">👁 VISITANTES: 001337</div>
+    <p>Este site foi feito com muito ★ e Comic Sans MS.</p>
+    <div class="webring">
+      <span class="badge">MELHOR VISTO EM 800×600</span>
+      <span class="badge">SEM FRAMES, SEM JAVA</span>
+      <span class="badge">100% HTML ARTESANAL</span>
+    </div>
+    <p>Diário semanal da disciplina — Computação Visual · Última atualização: hoje mesmo! 😄</p>
+  </div>
+
+</div>
+</body>
+</html>
