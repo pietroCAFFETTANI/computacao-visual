@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~*~ Semana 07 ~*~ Pipeline Gráfica e Renderização ~*~</title>
+<style>
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+  @keyframes rainbow {
+    0% { color: #ff00aa; }
+    20% { color: #ff8800; }
+    40% { color: #ffee00; }
+    60% { color: #00cc44; }
+    80% { color: #0099ff; }
+    100% { color: #ff00aa; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Comic Sans", Verdana, sans-serif;
+    color: #202020;
+    background-color: #006655;
+    background-image:
+      repeating-linear-gradient(45deg, #006655 0px, #006655 18px, #008070 18px, #008070 36px);
+    background-attachment: fixed;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  marquee {
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 6px 0;
+    border: 3px ridge #ccc;
+  }
+  .titlebox {
+    background: linear-gradient(180deg, #ffe066 0%, #ffcc00 50%, #ffaa00 100%);
+    border: 4px outset #fff3b0;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 10px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    text-shadow: 2px 2px 0 #fff, 3px 3px 0 #cc0000;
+    animation: rainbow 4s linear infinite;
+  }
+  .subtitle {
+    font-weight: bold;
+    color: #cc0000;
+    margin-top: 4px;
+  }
+  .blink {
+    animation: blinker 1s step-start infinite;
+    color: #ff0000;
+    font-weight: bold;
+  }
+  .content {
+    background: #ffffff;
+    border: 5px double #004d40;
+    padding: 1.2rem 1.4rem;
+    margin-top: 10px;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+  }
+  .construction {
+    background: repeating-linear-gradient(45deg, #ffee00, #ffee00 14px, #111 14px, #111 28px);
+    color: #111;
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+    border: 3px solid #000;
+    margin-bottom: 14px;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  h2 {
+    background: #004d40;
+    color: #ffffff;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.15rem;
+    border: 2px outset #4db6ac;
+    margin-top: 1.8rem;
+  }
+  h2::before { content: "► "; }
+  h3 {
+    color: #004d40;
+    border-bottom: 2px dotted #004d40;
+    font-size: 1.02rem;
+    margin: 1.3rem 0 0.3rem;
+  }
+  p, li {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  .postit {
+    background: #fff9b0;
+    border: 1px solid #d4c84a;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    transform: rotate(-0.6deg);
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.25);
+  }
+  /* diagrama da pipeline */
+  .pipe {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 1rem 0 0.4rem;
+  }
+  .pipe .box {
+    border: 3px outset #fff;
+    padding: 0.5rem 0.7rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+    text-align: center;
+    min-width: 92px;
+    color: #111;
+  }
+  .pipe .arrow { font-size: 1.3rem; color: #004d40; }
+  .b-app  { background: #fff59d; }
+  .b-geo  { background: #a5d6a7; }
+  .b-ras  { background: #b3c8f0; }
+  .b-pix  { background: #f8b9a5; }
+  .b-io   { background: #4d8fdc; color: #fff !important; }
+  .pipe.small .box { font-size: 0.78rem; min-width: 78px; padding: 0.4rem 0.4rem; background: #222; color: #fff; border: 2px outset #777; }
+  .pipe.small .arrow { font-size: 1rem; }
+  table.tab {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 0.92rem;
+  }
+  table.tab th {
+    background: #004d40;
+    color: #fff;
+    border: 2px solid #004d40;
+    padding: 6px;
+    text-align: left;
+  }
+  table.tab td {
+    border: 2px solid #004d40;
+    padding: 6px;
+    background: #e8f5f1;
+    vertical-align: top;
+  }
+  pre.code {
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.9rem;
+    border: 3px inset #888;
+    overflow-x: auto;
+    line-height: 1.4;
+  }
+  .formula {
+    background: #e8f5f1;
+    border: 2px solid #004d40;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 0.7rem;
+    margin: 0.8rem 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
+  }
+  code { background: #eceff1; padding: 0 4px; font-family: "Courier New", monospace; }
+  .badge {
+    display: inline-block;
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border: 2px solid #0f0;
+    margin: 2px;
+  }
+  .counter {
+    background: #000;
+    color: #ff3333;
+    font-family: "Courier New", monospace;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    display: inline-block;
+    padding: 6px 10px;
+    border: 3px inset #888;
+  }
+  hr.dotted {
+    border: none;
+    border-top: 3px dotted #004d40;
+    margin: 1.6rem 0;
+  }
+  .footer {
+    background: #ffe066;
+    border: 4px outset #fff3b0;
+    margin-top: 10px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .webring { margin-top: 0.6rem; }
+  .refs { font-size: 0.85rem; color: #444; }
+  a { color: #0000ee; }
+  a:visited { color: #551a8b; }
+  .star { color: #ff9900; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <marquee behavior="scroll" scrollamount="5">
+    ★彡 BLOG DE COMPUTAÇÃO VISUAL 彡★ &nbsp;&nbsp; HOJE: COMO UMA CENA 3D VIRA UMA IMAGEM NA TELA &nbsp;&nbsp; ADICIONE AOS FAVORITOS (CTRL+D) &nbsp;&nbsp; ★彡 MELHOR VISUALIZADO EM 800x600 彡★
+  </marquee>
+
+  <div class="titlebox">
+    <h1>PIPELINE GRÁFICA<br>E RENDERIZAÇÃO</h1>
+    <div class="subtitle">Semana 07 &nbsp;|&nbsp; Diário da disciplina Computação Visual <span class="blink">★ NOVO ★</span></div>
+  </div>
+
+  <div class="content">
+
+    <div class="construction">🚧 PÁGINA EM CONSTRUÇÃO — VOLTE SEMPRE! 🚧</div>
+
+    <p>
+      Fala, pessoal! Até aqui a gente trabalhou com imagens que já existiam:
+      capturar, ajustar intensidade, filtrar, achar bordas, olhar frequências.
+      Essa semana é o caminho inverso: <strong>como o computador cria uma
+      imagem do zero</strong> a partir de uma cena 3D? A resposta é a
+      <strong>pipeline gráfica</strong>, e é basicamente o coração de qualquer
+      jogo ou aplicação 3D em tempo real <span class="star">☆</span>
+    </p>
+
+    <h2>O que é uma pipeline?</h2>
+    <p>
+      A palavra vem do mundo real: oleoduto, fábrica, linha de montagem,
+      até o metrô. Em todos esses casos temos <strong>vários estágios</strong>
+      e um <strong>fluxo</strong> entre eles. No exemplo do metrô da aula:
+      o trem que está na estação Paraíso não pode ir para a Vergueiro enquanto
+      o trem da Vergueiro não avançar para São Joaquim. Cada estágio depende
+      do anterior liberar espaço.
+    </p>
+    <p>
+      Na computação gráfica, a <strong>pipeline de renderização</strong> (ou
+      só "pipeline") é a "engine" que produz uma <strong>imagem 2D</strong> a
+      partir de uma <strong>cena 3D</strong>. Ela é o núcleo dos gráficos em
+      tempo real.
+    </p>
+
+    <h2>"Renderizar uma cena 3D"</h2>
+    <p>
+      Pensa em tirar uma foto: você precisa de uma câmera, que decide o que
+      vai aparecer na imagem final. No computador usamos uma
+      <strong>câmera virtual</strong>. E a cena 3D em si é composta de:
+    </p>
+    <ul>
+      <li><strong>Geometria:</strong> polígonos, arestas e vértices;</li>
+      <li><strong>Fontes de luz;</strong></li>
+      <li><strong>Material</strong> das superfícies (como elas reagem à luz);</li>
+      <li><strong>Texturas.</strong></li>
+    </ul>
+    <p>
+      A peça básica é o <strong>triângulo</strong>, formado por 3 vértices.
+      Cada vértice é uma coordenada (x, y, z) e ainda pode carregar um vetor
+      normal e outras informações, como cor.
+    </p>
+
+    <h3>A câmera virtual</h3>
+    <p>Uma câmera virtual é definida por:</p>
+    <table class="tab">
+      <tr><th>Parâmetro</th><th>O que é</th></tr>
+      <tr><td><code>pos</code></td><td>posição da câmera na cena</td></tr>
+      <tr><td><code>dir</code></td><td>vetor de direção para onde ela olha</td></tr>
+      <tr><td><code>up</code></td><td>vetor que diz qual lado é "para cima"</td></tr>
+      <tr><td><code>fov</code></td><td>campo de visão (<em>field of view</em>), o ângulo que ela enxerga</td></tr>
+      <tr><td><code>near</code> e <code>far</code></td><td>planos mais próximo e mais distante que limitam o que é visível</td></tr>
+    </table>
+    <p>
+      A imagem final é criada só a partir da geometria que está dentro do
+      <strong>view frustum</strong> (o volume de visão, aquele tronco de
+      pirâmide formado por esses parâmetros). O que estiver fora dele não
+      entra na foto.
+    </p>
+
+    <h2>Os 4 estágios da pipeline</h2>
+    <div class="pipe">
+      <div class="box b-io">Input<br>(cena 3D)</div><span class="arrow">➜</span>
+      <div class="box b-app">Aplicação</div><span class="arrow">➜</span>
+      <div class="box b-geo">Geometria</div><span class="arrow">➜</span>
+      <div class="box b-ras">Rasterização</div><span class="arrow">➜</span>
+      <div class="box b-pix">Proc. de Pixel</div><span class="arrow">➜</span>
+      <div class="box b-io">Output<br>(imagem)</div>
+    </div>
+    <p style="text-align:center; font-size:0.8rem; color:#555;">
+      (esquema adaptado da Figura 2.2 do livro Real-Time Rendering, 4ª ed.)
+    </p>
+
+    <h3>1. Estágio de Aplicação</h3>
+    <p>
+      É código que roda na <strong>CPU</strong>, e quem decide o que acontece
+      aqui é o(a) programador(a): interação com o usuário, detecção de
+      colisão, animação e simulação, técnicas de otimização... Parte disso
+      pode até rodar na GPU (GPGPU) via <em>compute shaders</em>. No final,
+      esse estágio manda as <strong>primitivas</strong> (vértices, arestas,
+      triângulos) para o hardware gráfico: CPU ➜ GPU.
+    </p>
+
+    <h3>2. Estágio de Geometria</h3>
+    <p>
+      Processa a geometria que veio da aplicação e calcula <em>o que</em>
+      deve ser exibido, <em>como</em> e <em>onde</em> na tela. Ele é dividido
+      em cinco subestágios:
+    </p>
+    <div class="pipe small">
+      <div class="box">Model &amp; View Transform</div><span class="arrow">➜</span>
+      <div class="box">Vertex Shading</div><span class="arrow">➜</span>
+      <div class="box">Projection</div><span class="arrow">➜</span>
+      <div class="box">Clipping</div><span class="arrow">➜</span>
+      <div class="box">Screen Mapping</div>
+    </div>
+    <ul>
+      <li>
+        <strong>Transformação de modelo:</strong> cada objeto nasce no
+        <em>model space</em> (espaço local). Por exemplo, uma esfera com
+        centro em (0,0,0) e raio 1. Aplicando translação, rotação e escala,
+        a gente leva esse objeto para o <em>world space</em> (espaço do
+        mundo) e ele aparece em outro lugar da cena.
+      </li>
+      <li>
+        <strong>Transformação de visão:</strong> a câmera e todos os objetos
+        são reposicionados de forma que a câmera fique na origem, olhando
+        para o eixo Z negativo (X positivo = direita, Y positivo = cima).
+        Esse é o <em>camera space</em> (ou view/eye space), e deixa o corte e
+        a projeção mais simples e rápidos.
+      </li>
+      <li>
+        <strong>Vertex shading:</strong> calcula o efeito de materiais e
+        luzes <em>nos vértices</em>. Exemplo da aula: um triângulo com três
+        vértices de cores diferentes (azul, vermelho, verde), onde o
+        resultado suave entre eles é calculado depois.
+      </li>
+      <li>
+        <strong>Projeção:</strong> transforma o volume de visão em um cubo
+        unitário. Existem dois tipos: a <em>ortogonal</em> (paralela, útil em
+        algumas aplicações) e a <em>perspectiva</em> (a mais comum, simula como
+        a gente enxerga: objetos mais longe parecem menores).
+      </li>
+      <li>
+        <strong>Corte (clipping):</strong> depois da projeção, o que está
+        <em>dentro</em> do cubo unitário fica como está; o que está
+        <em>totalmente fora</em> é descartado; o que está <em>parte dentro e
+        parte fora</em> é cortado no limite do cubo (criando vértices novos).
+      </li>
+      <li>
+        <strong>Mapeamento na tela:</strong> escala e translada o cubo unitário
+        para a região de renderização (a janela). O resultado são as
+        <em>screen coordinates</em> mais o eixo Z (profundidade, <em>z-depth</em>),
+        que juntos formam as <em>window coordinates</em>, enviadas para a
+        rasterização.
+      </li>
+    </ul>
+
+    <div class="postit">
+      📌 resumo do caminho das coordenadas: <strong>model space ➜ world space
+      ➜ camera space ➜ (luz) ➜ projeção ➜ clip ➜ tela</strong>
+    </div>
+
+    <h3>3. Estágio de Rasterização</h3>
+    <p>
+      Recebe (geralmente) os três vértices de um triângulo e descobre
+      <strong>quais pixels ficam dentro dele</strong>. É a varredura: o
+      triângulo (que é uma forma contínua) vira um conjunto de quadradinhos
+      da grade de pixels. Esse estágio também tem subestágios:
+    </p>
+    <div class="pipe small">
+      <div class="box">Triangle Setup</div><span class="arrow">➜</span>
+      <div class="box">Triangle Traversal</div><span class="arrow">➜</span>
+      <div class="box">Pixel Shading</div><span class="arrow">➜</span>
+      <div class="box">Merging</div>
+    </div>
+    <ul>
+      <li>
+        <strong>Configuração de triângulo:</strong> calcula os dados do
+        triângulo que serão usados na varredura.
+      </li>
+      <li>
+        <strong>Varredura de triângulo:</strong> encontra os pixels dentro do
+        triângulo (aresta ou vértice) e gera um <strong>fragmento</strong>
+        para cada um. As propriedades do fragmento (inclusive profundidade e
+        shading) vêm da <strong>interpolação</strong> dos dados dos 3
+        vértices.
+      </li>
+      <li>
+        <strong>Pixel shading:</strong> faz os cálculos de tonalização no
+        nível do pixel e produz uma ou mais cores. Uma aplicação clássica aqui
+        é a <strong>texturização</strong>: a imagem de textura é "colada" no
+        modelo (o exemplo da aula foi um dragão sem textura virando um dragão
+        colorido).
+      </li>
+      <li>
+        <strong>Merging (combinação de buffers):</strong> o <em>color
+        buffer</em> guarda a cor de cada pixel (um array retangular). Aqui a
+        cor do fragmento é combinada com o que já está nele, e também é feito
+        o cálculo de visibilidade com o <strong>z-buffer</strong>.
+      </li>
+    </ul>
+
+    <h3>O algoritmo Z-buffer</h3>
+    <p>
+      É uma ideia bem simples e genial para resolver "quem está na frente de
+      quem":
+    </p>
+    <ol>
+      <li>guarda o valor Z (profundidade) de cada pixel;</li>
+      <li>durante a varredura, calcula o Z do triângulo em cada pixel;</li>
+      <li>compara o Z do triângulo com o Z que está no z-buffer;</li>
+      <li>se o Z do triângulo for <strong>menor</strong> (mais perto), substitui o z-buffer e o color buffer;</li>
+      <li>senão, não faz nada.</li>
+    </ol>
+<pre class="code">para cada triângulo:
+    para cada pixel (x, y) dentro do triângulo:
+        z = profundidade do triângulo em (x, y)
+        se z &lt; zbuffer[x][y]:
+            zbuffer[x][y] = z
+            colorbuffer[x][y] = cor do fragmento
+        # senão: não faz nada (o pixel já tem algo mais perto)</pre>
+    <p>
+      Por causa disso, a ordem em que os triângulos são desenhados não
+      importa: desenhar o triângulo 1 e depois o 2, ou o contrário, dá o
+      mesmo resultado correto, com o triângulo mais próximo cobrindo o mais
+      distante.
+    </p>
+
+    <h3>4. Processamento de Pixel</h3>
+    <p>
+      Executa um programa <em>por pixel</em> para determinar a cor final.
+      Também pode fazer o <strong>teste de profundidade</strong> (o pixel é
+      visível ou não?) e operações de <strong>blend</strong>, que misturam a
+      cor do pixel com cores calculadas antes.
+    </p>
+
+    <h2>Outros canais e buffers</h2>
+    <table class="tab">
+      <tr><th>Nome</th><th>Pra que serve</th></tr>
+      <tr><td><strong>Alpha channel</strong></td><td>opacidade (transparência) do pixel</td></tr>
+      <tr><td><strong>Stencil buffer</strong></td><td>efeitos especiais, como máscaras e espelhos</td></tr>
+      <tr><td><strong>Accumulation buffer</strong></td><td>efeitos como motion blur, profundidade de campo, antialiasing e sombras suaves</td></tr>
+      <tr><td><strong>Frame buffer</strong></td><td>geralmente é o conjunto de todos os buffers do sistema</td></tr>
+      <tr><td><strong>Double buffer</strong></td><td>a cena é renderizada <em>offscreen</em> (back buffer); quando termina, o conteúdo é copiado para o front buffer (o que aparece na tela)</td></tr>
+    </table>
+
+    <h2>Velocidade e gargalo (bottleneck)</h2>
+    <p>
+      A velocidade de renderização é definida pelo <strong>estágio mais lento
+      da pipeline</strong>, o chamado <strong>bottleneck</strong> (gargalo).
+      Faz sentido pensando na linha de montagem da aula: se um funcionário
+      trabalha mais devagar que os outros, todo o resto fica esperando e a
+      fábrica inteira só produz no ritmo dele.
+    </p>
+    <p>A velocidade pode ser expressa de duas formas:</p>
+    <ul>
+      <li><strong>FPS (frames per second):</strong> número de imagens renderizadas por segundo;</li>
+      <li><strong>Hertz (Hz):</strong> frequência de atualização do display (é do hardware), geralmente indicada em milissegundos, já que é 1/segundos.</li>
+    </ul>
+    <div class="postit">
+      📌 conclusão prática: não adianta otimizar uma parte da pipeline que
+      <strong>não</strong> é o gargalo, porque o fluxo continua limitado por
+      ele. Primeiro a gente descobre e resolve o gargalo, depois otimiza o
+      resto.
+    </div>
+
+    <hr class="dotted">
+
+    <p>
+      <strong>Resumo da semana:</strong> renderizar uma cena 3D é passar
+      triângulos por uma linha de montagem de quatro estágios:
+      <strong>Aplicação</strong> (CPU decide o que enviar),
+      <strong>Geometria</strong> (leva os vértices do espaço do modelo até a
+      tela),
+      <strong>Rasterização</strong> (descobre quais pixels cada triângulo
+      cobre) e <strong>Processamento de Pixel</strong> (define a cor final e
+      resolve a visibilidade com o z-buffer). A velocidade de todo o conjunto
+      é ditada pelo estágio mais lento. 🎉
+    </p>
+
+    <p class="refs">
+      Baseado na aula do Prof. André Kishimoto (2026), adaptada de:
+      AKENINE-MÖLLER, T. et al. <em>Real-Time Rendering, 4th ed.</em> CRC Press, 2018;
+      e AKENINE-MÖLLER, T. <em>Advanced computer graphics EDA 425, lp 4</em> (lecture slides), 2003.
+    </p>
+
+  </div>
+
+  <div class="footer">
+    <div class="counter">👁 VISITANTES: 001339</div>
+    <p>Este site foi feito com muito ★ e Comic Sans MS.</p>
+    <div class="webring">
+      <span class="badge">MELHOR VISTO EM 800×600</span>
+      <span class="badge">SEM FRAMES, SEM JAVA</span>
+      <span class="badge">100% HTML ARTESANAL</span>
+    </div>
+    <p>Diário semanal da disciplina — Computação Visual · Última atualização: hoje mesmo! 😄</p>
+  </div>
+
+</div>
+</body>
+</html>

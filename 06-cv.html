@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~*~ Semana 06 ~*~ Domínio da Frequência e Transformada de Fourier ~*~</title>
+<style>
+  @keyframes blinker {
+    50% { opacity: 0; }
+  }
+  @keyframes rainbow {
+    0% { color: #ff00aa; }
+    20% { color: #ff8800; }
+    40% { color: #ffee00; }
+    60% { color: #00cc44; }
+    80% { color: #0099ff; }
+    100% { color: #ff00aa; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Comic Sans MS", "Comic Sans", Verdana, sans-serif;
+    color: #202020;
+    background-color: #5a0099;
+    background-image:
+      repeating-linear-gradient(45deg, #5a0099 0px, #5a0099 18px, #6e00bb 18px, #6e00bb 36px);
+    background-attachment: fixed;
+  }
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  marquee {
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 6px 0;
+    border: 3px ridge #ccc;
+  }
+  .titlebox {
+    background: linear-gradient(180deg, #ffe066 0%, #ffcc00 50%, #ffaa00 100%);
+    border: 4px outset #fff3b0;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 10px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    text-shadow: 2px 2px 0 #fff, 3px 3px 0 #cc0000;
+    animation: rainbow 4s linear infinite;
+  }
+  .subtitle {
+    font-weight: bold;
+    color: #cc0000;
+    margin-top: 4px;
+  }
+  .blink {
+    animation: blinker 1s step-start infinite;
+    color: #ff0000;
+    font-weight: bold;
+  }
+  .content {
+    background: #ffffff;
+    border: 5px double #4b0082;
+    padding: 1.2rem 1.4rem;
+    margin-top: 10px;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.35);
+  }
+  .construction {
+    background: repeating-linear-gradient(45deg, #ffee00, #ffee00 14px, #111 14px, #111 28px);
+    color: #111;
+    text-align: center;
+    font-weight: bold;
+    padding: 6px;
+    border: 3px solid #000;
+    margin-bottom: 14px;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  h2 {
+    background: #4b0082;
+    color: #ffffff;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.15rem;
+    border: 2px outset #b388ff;
+    margin-top: 1.8rem;
+  }
+  h2::before { content: "► "; }
+  p, li {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+  .postit {
+    background: #fff9b0;
+    border: 1px solid #d4c84a;
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    transform: rotate(-0.6deg);
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.25);
+  }
+  .formula {
+    background: #eef3ff;
+    border: 2px solid #4b0082;
+    font-family: "Courier New", monospace;
+    text-align: center;
+    padding: 0.7rem;
+    margin: 0.8rem 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
+  }
+  pre.code {
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 0.9rem;
+    border: 3px inset #888;
+    overflow-x: auto;
+    line-height: 1.4;
+  }
+  table.tab {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 0.92rem;
+  }
+  table.tab th {
+    background: #4b0082;
+    color: #fff;
+    border: 2px solid #4b0082;
+    padding: 6px;
+    text-align: left;
+  }
+  table.tab td {
+    border: 2px solid #4b0082;
+    padding: 6px;
+    background: #f5eeff;
+    vertical-align: top;
+  }
+  .badge {
+    display: inline-block;
+    background: #000;
+    color: #0f0;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border: 2px solid #0f0;
+    margin: 2px;
+  }
+  .counter {
+    background: #000;
+    color: #ff3333;
+    font-family: "Courier New", monospace;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    display: inline-block;
+    padding: 6px 10px;
+    border: 3px inset #888;
+  }
+  hr.dotted {
+    border: none;
+    border-top: 3px dotted #4b0082;
+    margin: 1.6rem 0;
+  }
+  .footer {
+    background: #ffe066;
+    border: 4px outset #fff3b0;
+    margin-top: 10px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+  }
+  .webring { margin-top: 0.6rem; }
+  a { color: #0000ee; }
+  a:visited { color: #551a8b; }
+  .star { color: #ff9900; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <marquee behavior="scroll" scrollamount="5">
+    ★彡 BLOG DE COMPUTAÇÃO VISUAL 彡★ &nbsp;&nbsp; HOJE: FOURIER, O CARA QUE DECOMPÕE TUDO EM ONDINHAS &nbsp;&nbsp; ADICIONE AOS FAVORITOS (CTRL+D) &nbsp;&nbsp; ★彡 MELHOR VISUALIZADO EM 800x600 彡★
+  </marquee>
+
+  <div class="titlebox">
+    <h1>DOMÍNIO DA FREQUÊNCIA<br>E TRANSFORMADA DE FOURIER</h1>
+    <div class="subtitle">Semana 06 &nbsp;|&nbsp; Diário da disciplina Computação Visual <span class="blink">★ NOVO ★</span></div>
+  </div>
+
+  <div class="content">
+
+    <div class="construction">🚧 PÁGINA EM CONSTRUÇÃO — VOLTE SEMPRE! 🚧</div>
+
+    <p>
+      E aí, galera! Até agora tudo que a gente fez com imagens aconteceu
+      direto nos pixels: mexer em intensidade, aplicar filtros com vizinhança,
+      achar bordas. Essa semana o jogo muda: em vez de olhar a imagem como
+      "uma grade de pixels", a gente passa a olhar como uma
+      <strong>mistura de ondas com frequências diferentes</strong>. Parece
+      esquisito no começo, mas explica muita coisa que já vimos
+      <span class="star">☆</span>
+    </p>
+
+    <h2>A ideia de Fourier</h2>
+    <p>
+      O matemático Joseph Fourier mostrou que praticamente qualquer sinal
+      pode ser escrito como uma <strong>soma de senoides</strong> (ondas de
+      seno e cosseno), cada uma com uma frequência, uma amplitude e uma fase.
+      A <strong>Transformada de Fourier</strong> é a ferramenta que descobre
+      "quais ondas, e em que quantidade, compõem esse sinal".
+    </p>
+    <p>
+      Pense numa música: no domínio do tempo você vê a onda sonora inteira
+      misturada; no domínio da frequência você vê quais notas (graves e
+      agudas) estão tocando. Com imagens é a mesma coisa, só que a
+      "frequência" é <strong>espacial</strong>: ela diz o quão rápido a
+      intensidade muda ao andar pela imagem.
+    </p>
+
+    <h2>Frequências em uma imagem</h2>
+    <table class="tab">
+      <tr><th>Tipo</th><th>O que representa na imagem</th></tr>
+      <tr><td><strong>Baixas frequências</strong></td><td>Variações suaves: céu limpo, parede lisa, o "corpo" geral e o brilho médio da imagem</td></tr>
+      <tr><td><strong>Altas frequências</strong></td><td>Mudanças bruscas: bordas, texturas finas, detalhes e também ruído</td></tr>
+    </table>
+    <div class="postit">
+      📌 conexão com a semana passada: bordas = altas frequências! Por isso
+      os filtros de derivada (Sobel, Prewitt...) realçam bordas, e por isso
+      eles também amplificam ruído.
+    </div>
+
+    <h2>A Transformada Discreta de Fourier (DFT)</h2>
+    <p>
+      Como imagens digitais são discretas (uma grade de números), usamos a
+      versão discreta. Para uma imagem f(x, y) de tamanho M × N:
+    </p>
+    <div class="formula">
+      F(u,v) = &Sigma;<sub>x</sub> &Sigma;<sub>y</sub> f(x,y) &middot; e<sup>-j2&pi;(ux/M + vy/N)</sup>
+    </div>
+    <p>
+      O resultado F(u, v) é uma matriz do mesmo tamanho da imagem, mas de
+      <strong>números complexos</strong>: cada posição (u, v) diz "quanto"
+      da onda com aquela frequência e direção existe na imagem. E dá para
+      voltar: a <strong>transformada inversa</strong> reconstrói a imagem
+      original sem perder nada.
+    </p>
+    <p>
+      Calcular a DFT "no braço" é lento (cresce com N² para sinais 1D). O
+      algoritmo <strong>FFT</strong> (Fast Fourier Transform) calcula o
+      mesmo resultado em tempo proporcional a N log N, e é isso que
+      qualquer biblioteca usa na prática.
+    </p>
+
+    <h2>Lendo o espectro</h2>
+    <p>
+      Como o resultado é complexo, ele costuma ser separado em duas partes:
+    </p>
+    <ul>
+      <li><strong>Magnitude (espectro):</strong> diz <em>quanta</em> energia existe em cada frequência. É o que normalmente a gente plota.</li>
+      <li><strong>Fase:</strong> diz <em>onde</em> cada onda está posicionada. Parece menos importante, mas é a fase que carrega a estrutura da imagem (sem ela, o objeto vira uma bagunça irreconhecível).</li>
+    </ul>
+    <p>Alguns truques para visualizar o espectro direito:</p>
+    <ul>
+      <li><strong>Centralizar:</strong> por padrão a frequência zero (o componente DC, que é basicamente o brilho médio da imagem) fica no canto. Uma operação de "shift" a move para o centro. Depois disso, perto do centro = baixas frequências, e quanto mais longe, mais altas.</li>
+      <li><strong>Escala logarítmica:</strong> o componente DC é gigante perto dos outros valores, então o espectro parece todo preto, com um ponto branco no meio. Aplicar <code>log(1 + |F|)</code> resolve, e é exatamente a transformação logarítmica da semana 3!</li>
+      <li><strong>Direções:</strong> as estruturas no espectro são perpendiculares às da imagem. Uma borda vertical gera energia espalhada na direção horizontal do espectro, e vice-versa.</li>
+    </ul>
+
+    <h2>Filtragem no domínio da frequência</h2>
+    <p>
+      Aqui é onde a coisa fica útil. Em vez de passar um kernel pela imagem
+      pixel a pixel, o processo é:
+    </p>
+    <ol>
+      <li>Calcular a FFT da imagem: <code>F(u,v)</code>;</li>
+      <li>Multiplicar, ponto a ponto, por uma máscara de filtro: <code>G(u,v) = H(u,v) &middot; F(u,v)</code>;</li>
+      <li>Calcular a transformada inversa de G e pegar a parte real: a imagem filtrada.</li>
+    </ol>
+    <p>
+      O trabalho todo está em escolher bem o <code>H(u,v)</code>:
+    </p>
+    <table class="tab">
+      <tr><th>Filtro</th><th>O que faz</th><th>Efeito na imagem</th></tr>
+      <tr><td><strong>Passa-baixas</strong></td><td>Mantém frequências perto do centro e corta as altas</td><td>Suaviza / borra; reduz ruído, mas perde detalhes</td></tr>
+      <tr><td><strong>Passa-altas</strong></td><td>Corta as baixas e mantém as altas</td><td>Realça bordas e detalhes finos</td></tr>
+      <tr><td><strong>Passa-faixa</strong></td><td>Mantém só uma faixa intermediária de frequências</td><td>Isola texturas de um certo "tamanho"</td></tr>
+      <tr><td><strong>Rejeita-faixa / notch</strong></td><td>Apaga frequências específicas</td><td>Remove ruído periódico (ex: listras de scanner ou moiré)</td></tr>
+    </table>
+    <p>
+      E existem várias formas de desenhar a máscara. O filtro
+      <strong>ideal</strong> corta de forma abrupta e dá um efeito feio
+      de "ondinhas" ao redor das bordas (o <em>ringing</em>, ligado ao
+      fenômeno de Gibbs). O <strong>Butterworth</strong> faz uma transição
+      mais gradual, e o <strong>Gaussiano</strong> é o mais suave de todos,
+      sem ringing. O Gaussiano é o mesmo da semana passada, só que visto do
+      outro lado do espelho: um Gaussiano no espaço vira um Gaussiano na
+      frequência.
+    </p>
+
+    <h2>O teorema da convolução</h2>
+    <p>
+      Esse é o resultado mais bonito do assunto, e conecta tudo que a gente
+      viu até aqui:
+    </p>
+    <div class="formula">
+      convolução no espaço &nbsp;&harr;&nbsp; multiplicação na frequência<br>
+      f(x,y) &lowast; h(x,y) &nbsp;&harr;&nbsp; F(u,v) &middot; H(u,v)
+    </div>
+    <p>
+      Ou seja: aplicar um kernel (média, Gaussiano, Sobel, Laplaciano...)
+      numa imagem é equivalente a multiplicar os espectros. Cada filtro
+      espacial que a gente já usou tem uma "versão na frequência". Qual
+      caminho usar? Para kernels pequenos (3×3, 5×5), a convolução direta
+      costuma ser mais rápida. Para kernels grandes, passar para a
+      frequência com a FFT compensa bastante.
+    </p>
+
+    <h2>Propriedades que ajudam</h2>
+    <ul>
+      <li><strong>Linearidade:</strong> a transformada da soma é a soma das transformadas.</li>
+      <li><strong>Translação:</strong> mover a imagem só muda a fase, a magnitude do espectro continua igual.</li>
+      <li><strong>Rotação:</strong> girar a imagem gira o espectro pelo mesmo ângulo.</li>
+      <li><strong>Periodicidade:</strong> a DFT assume que a imagem se repete infinitamente, o que explica certos artefatos nas bordas da imagem depois de filtrar.</li>
+    </ul>
+    <div class="postit">
+      📌 e lá da semana 2: a frequência também explica o <strong>aliasing</strong>.
+      Se a amostragem não for rápida o bastante (Nyquist: pelo menos o dobro
+      da maior frequência do sinal), as altas frequências "se disfarçam" de
+      baixas e aparecem padrões falsos, tipo o moiré.
+    </div>
+
+    <h2>Mão na massa (Python)</h2>
+    <p>
+      Um passa-baixas ideal bem simples usando NumPy:
+    </p>
+<pre class="code">import numpy as np
+
+# img: imagem em tons de cinza (matriz 2D)
+F = np.fft.fft2(img)              # 1. FFT
+F = np.fft.fftshift(F)            #    DC no centro
+
+# 2. cria a máscara (círculo de raio r no centro)
+M, N = img.shape
+y, x = np.ogrid[:M, :N]
+dist = np.sqrt((x - N/2)**2 + (y - M/2)**2)
+H = (dist &lt;= 30).astype(float)    # passa-baixas, raio 30
+
+G = F * H                         #    multiplica pelo filtro
+
+# 3. volta para o domínio espacial
+G = np.fft.ifftshift(G)
+saida = np.real(np.fft.ifft2(G))
+
+# espectro para visualizar (escala log)
+espectro = np.log(1 + np.abs(F))</pre>
+    <p>
+      Para virar um passa-altas, é só inverter a máscara (<code>1 - H</code>).
+    </p>
+
+    <h2>Onde isso é usado na vida real</h2>
+    <ul>
+      <li><strong>Compressão:</strong> o JPEG usa uma variação (a DCT) e joga fora as altas frequências que o olho humano quase não percebe.</li>
+      <li><strong>Restauração:</strong> tirar ruído periódico, listras e padrões de interferência.</li>
+      <li><strong>Análise de textura:</strong> o espectro mostra padrões repetitivos que são difíceis de ver nos pixels.</li>
+      <li><strong>Filtros rápidos:</strong> convoluções com kernels grandes via FFT.</li>
+    </ul>
+
+    <hr class="dotted">
+
+    <p>
+      <strong>Resumo da semana:</strong> toda imagem pode ser vista como uma
+      soma de ondas de várias frequências. A Transformada de Fourier muda a
+      imagem de "pixels" para "frequências", e lá filtrar vira só uma
+      multiplicação: segurar as baixas suaviza, segurar as altas realça
+      detalhes, e apagar picos específicos remove ruído periódico. Com o
+      teorema da convolução, tudo que a gente fez com kernels nas semanas
+      anteriores aparece de novo, só que do outro lado. 🎉
+    </p>
+
+  </div>
+
+  <div class="footer">
+    <div class="counter">👁 VISITANTES: 001338</div>
+    <p>Este site foi feito com muito ★ e Comic Sans MS.</p>
+    <div class="webring">
+      <span class="badge">MELHOR VISTO EM 800×600</span>
+      <span class="badge">SEM FRAMES, SEM JAVA</span>
+      <span class="badge">100% HTML ARTESANAL</span>
+    </div>
+    <p>Diário semanal da disciplina — Computação Visual · Última atualização: hoje mesmo! 😄</p>
+  </div>
+
+</div>
+</body>
+</html>
